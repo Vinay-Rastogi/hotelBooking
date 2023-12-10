@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     function redirectToEditAddress() {
         if (isLoggedIn()) {
-            window.location.href = 'editAddress.html'
+            window.location.href = 'editDate.html'
         }
     }
 
@@ -60,10 +60,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         redirectToLogin();
         document.getElementById('viewAllBooking').addEventListener('click', () => { window.location.href = 'viewAllBooking.html' });
         document.getElementById('logout').addEventListener('click', logout);
-        document.getElementById('bookHotelFormButton').addEventListener('click', submitHotelBookingForm);
-        document.getElementById('standardRoomBtn').addEventListener('click',bookStandardRoom);
-        document.getElementById('deluxeRoomBtn').addEventListener('click',bookDeluxeRoom);
-        document.getElementById('suiteRoomBtn').addEventListener('click',bookSuiteRoom);
+        document.getElementById('standardRoomBtn').addEventListener('click', bookStandardRoom);
+        document.getElementById('deluxeRoomBtn').addEventListener('click', bookDeluxeRoom);
+        document.getElementById('suiteRoomBtn').addEventListener('click', bookSuiteRoom);
     }
 
     if (document.body.id === 'viewBookings') {
@@ -76,8 +75,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     if (document.body.id === 'editBookingAddress') {
-        document.getElementById('editBookingAddressBtn').addEventListener('click', editBookingAddress);
+
         document.getElementById('viewBookings').addEventListener('click', redirectToHome);
+        document.getElementById('editBookingDateBtn').addEventListener('click', editBookingAddress);
         document.getElementById('logout').addEventListener('click', logout);
     }
 
@@ -146,20 +146,61 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    async function submitHotelBookingForm() {
+    // async function submitHotelBookingForm() {
 
-        const address = document.getElementById('address').value;
+    //     const address = document.getElementById('address').value;
 
-        if (!address) {
-            displayErrorMessage('Please enter the delivery address.');
+    //     if (!address) {
+    //         displayErrorMessage('Please enter the delivery address.');
+    //         return;
+    //     }
+
+    //     try {
+    //         const response = await fetch(`/book-Hotel`, {
+    //             method: 'POST',
+    //             ...getAuthRequestOptions(),
+    //             body: JSON.stringify({ address }),
+    //         });
+
+    //         if (response.ok) {
+    //             const res = await response.json();
+    //             if (res.message) {
+    //                 alert('Booking Successful!');
+    //                 redirectToHome();
+    //             } else {
+    //                 displayErrorMessage('Unknown response format');
+    //             }
+    //         } else {
+    //             const errorRes = await response.json();
+    //             // alert(errorRes.error);
+    //             displayErrorMessage((errorRes.error + ' Redirecting to booking page in 5 seconds') || 'An error occurred. Redirecting to booking page in 5 seconds');
+    //             setTimeout(redirectToHome, 5000);
+    //         }
+    //     } catch (error) {
+    //         console.error('Error during Hotel booking:', error);
+    //         displayErrorMessage('An error occurred. Please try again later.');
+    //     }
+    // }
+
+    async function bookStandardRoom() {
+
+
+        const dateOfBooking = document.getElementById('bookingDate').value;
+        const roomType = "Standard Room";
+
+
+        if (!dateOfBooking) {
+            displayErrorMessage('Please enter the date of booking.');
             return;
         }
 
         try {
-            const response = await fetch(`/book-Hotel`, {
+
+
+            const response = await fetch(`/book-gas`, {
                 method: 'POST',
                 ...getAuthRequestOptions(),
-                body: JSON.stringify({ address }),
+                body: JSON.stringify({ dateOfBooking, roomType }),
             });
 
             if (response.ok) {
@@ -176,131 +217,93 @@ document.addEventListener('DOMContentLoaded', async function () {
                 displayErrorMessage((errorRes.error + ' Redirecting to booking page in 5 seconds') || 'An error occurred. Redirecting to booking page in 5 seconds');
                 setTimeout(redirectToHome, 5000);
             }
-        } catch (error) {
-            console.error('Error during Hotel booking:', error);
-            displayErrorMessage('An error occurred. Please try again later.');
-        }
-    }
 
-    async function bookStandardRoom(){
-         
-            const dateOfBooking  = document.getElementById('bookingDate').value;
-            const roomType = "Standard Room";
-
-            if(!dateOfBooking){
-              displayErrorMessage('Please enter the date of booking.');
-             return;
-            }
-
-            try {
-
-                const response = await fetch(`/book-Hotel`, {
-                    method: 'POST',
-                    ...getAuthRequestOptions(),
-                    body: JSON.stringify({ dateOfBooking }),
-                });
-    
-                if (response.ok) {
-                    const res = await response.json();
-                    if (res.message) {
-                        alert('Booking Successful!');
-                        redirectToHome();
-                    } else {
-                        displayErrorMessage('Unknown response format');
-                    }
-                } else {
-                    const errorRes = await response.json();
-                    // alert(errorRes.error);
-                    displayErrorMessage((errorRes.error + ' Redirecting to booking page in 5 seconds') || 'An error occurred. Redirecting to booking page in 5 seconds');
-                    setTimeout(redirectToHome, 5000);
-                }
-                  
-            }
-            catch (error) {
-                console.error('Error during Hotel booking:', error);
-                displayErrorMessage('An error occurred. Please try again later.');
-            }
-    }
-
-    async function bookDeluxeRoom(){
-         
-        const dateOfBooking  = document.getElementById('bookingDate').value;
-        const roomType = "Deluxe Room";
-
-        if(!dateOfBooking){
-          displayErrorMessage('Please enter the date of booking.');
-         return;
-        }
-
-        try {
-
-            const response = await fetch(`/book-Hotel`, {
-                method: 'POST',
-                ...getAuthRequestOptions(),
-                body: JSON.stringify({ dateOfBooking }),
-            });
-
-            if (response.ok) {
-                const res = await response.json();
-                if (res.message) {
-                    alert('Booking Successful!');
-                    redirectToHome();
-                } else {
-                    displayErrorMessage('Unknown response format');
-                }
-            } else {
-                const errorRes = await response.json();
-                // alert(errorRes.error);
-                displayErrorMessage((errorRes.error + ' Redirecting to booking page in 5 seconds') || 'An error occurred. Redirecting to booking page in 5 seconds');
-                setTimeout(redirectToHome, 5000);
-            }
-              
         }
         catch (error) {
             console.error('Error during Hotel booking:', error);
             displayErrorMessage('An error occurred. Please try again later.');
         }
-}
-
-async function bookDeluxeRoom(){
-         
-    const dateOfBooking  = document.getElementById('bookingDate').value;
-    const roomType = "Suite Room";
-
-    if(!dateOfBooking){
-      displayErrorMessage('Please enter the date of booking.');
-     return;
     }
 
-    try {
+    async function bookDeluxeRoom() {
 
-        const response = await fetch(`/book-Hotel`, {
-            method: 'POST',
-            ...getAuthRequestOptions(),
-            body: JSON.stringify({ dateOfBooking }),
-        });
+        const dateOfBooking = document.getElementById('bookingDate').value;
+        const roomType = "Deluxe Room";
 
-        if (response.ok) {
-            const res = await response.json();
-            if (res.message) {
-                alert('Booking Successful!');
-                redirectToHome();
-            } else {
-                displayErrorMessage('Unknown response format');
-            }
-        } else {
-            const errorRes = await response.json();
-            // alert(errorRes.error);
-            displayErrorMessage((errorRes.error + ' Redirecting to booking page in 5 seconds') || 'An error occurred. Redirecting to booking page in 5 seconds');
-            setTimeout(redirectToHome, 5000);
+        if (!dateOfBooking) {
+            displayErrorMessage('Please enter the date of booking.');
+            return;
         }
-          
+
+        try {
+
+            const response = await fetch(`/book-gas`, {
+                method: 'POST',
+                ...getAuthRequestOptions(),
+                body: JSON.stringify({ dateOfBooking, roomType }),
+            });
+
+            if (response.ok) {
+                const res = await response.json();
+                if (res.message) {
+                    alert('Booking Successful!');
+                    redirectToHome();
+                } else {
+                    displayErrorMessage('Unknown response format');
+                }
+            } else {
+                const errorRes = await response.json();
+                // alert(errorRes.error);
+                displayErrorMessage((errorRes.error + ' Redirecting to booking page in 5 seconds') || 'An error occurred. Redirecting to booking page in 5 seconds');
+                setTimeout(redirectToHome, 5000);
+            }
+
+        }
+        catch (error) {
+            console.error('Error during Hotel booking:', error);
+            displayErrorMessage('An error occurred. Please try again later.');
+        }
     }
-    catch (error) {
-        console.error('Error during Hotel booking:', error);
-        displayErrorMessage('An error occurred. Please try again later.');
+
+    async function bookSuiteRoom() {
+
+        const dateOfBooking = document.getElementById('bookingDate').value;
+        const roomType = "Suite Room";
+
+        if (!dateOfBooking) {
+            displayErrorMessage('Please enter the date of booking.');
+            return;
+        }
+
+        try {
+
+            const response = await fetch(`/book-gas`, {
+                method: 'POST',
+                ...getAuthRequestOptions(),
+                body: JSON.stringify({ dateOfBooking, roomType }),
+            });
+
+            if (response.ok) {
+                const res = await response.json();
+                if (res.message) {
+                    alert('Booking Successful!');
+                    redirectToHome();
+                } else {
+                    displayErrorMessage('Unknown response format');
+                }
+            } else {
+                const errorRes = await response.json();
+                // alert(errorRes.error);
+                displayErrorMessage((errorRes.error + ' Redirecting to booking page in 5 seconds') || 'An error occurred. Redirecting to booking page in 5 seconds');
+                setTimeout(redirectToHome, 5000);
+            }
+
+        }
+        catch (error) {
+            console.error('Error during Hotel booking:', error);
+            displayErrorMessage('An error occurred. Please try again later.');
+        }
     }
-}
 
 
 
@@ -330,7 +333,8 @@ async function bookDeluxeRoom(){
     }
 
     async function editBookingAddress() {
-        const updatedAddress = document.getElementById('address').value;
+
+        const updatedAddress = (document.getElementById('newBookingDate').value);
 
         if (!updatedAddress) {
             displayErrorMessage('Please enter the delivery address.');
@@ -357,7 +361,7 @@ async function bookDeluxeRoom(){
                 displayErrorMessage(errorRes.error || 'Error Updating Address');
             }
         } catch (error) {
-            console.log('Error during editBookingAddress:', error);
+            console.log('Error during editBookingDate:', error);
             displayErrorMessage('An error occurred. Please try again later.');
         }
     }
@@ -381,12 +385,12 @@ async function bookDeluxeRoom(){
                     document.getElementById('noBookingsMessage').style.color = 'red';
                 } else {
                     allBookings.sort((a, b) => new Date(b.bookingDate) - new Date(a.bookingDate));
-                    allBookings.forEach(booking => {
+                    allBookings.forEach((booking, index) => {
                         document.getElementById('allBookingsList').style.color = 'black';
                         const listItem = document.createElement('li');
                         listItem.style.padding = '1%';
                         listItem.innerHTML = `
-                            <p><strong>Booking ID:</strong> <span class="address">${booking._id}</span></p>
+                            <p><strong>Booking ID:</strong> <span class="address">${index + 1}</span></p>
                             <p><strong>Address:</strong> <span class="address">${booking.address}</span></p>
                             <p><strong>Booking Date:</strong> <span class="booking-date">${new Date(booking.bookingDate).toLocaleString()}</span></p>
                             <hr>
