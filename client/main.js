@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async function () {
-    const backendBaseUrl = 'http://localhost:3000';
 
     function displayErrorMessage(message) {
         const errorMessageElement = document.getElementById('errorMessage');
@@ -92,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         try {
-            const response = await fetch(`${backendBaseUrl}/login`, {
+            const response = await fetch(`/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -127,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         try {
-            const response = await fetch(`${backendBaseUrl}/signup`, {
+            const response = await fetch(`/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -157,7 +156,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         try {
-            const response = await fetch(`${backendBaseUrl}/book-Hotel`, {
+            const response = await fetch(`/book-Hotel`, {
                 method: 'POST',
                 ...getAuthRequestOptions(),
                 body: JSON.stringify({ address }),
@@ -195,7 +194,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             try {
 
-                const response = await fetch(`${backendBaseUrl}/book-Hotel`, {
+                const response = await fetch(`/book-Hotel`, {
                     method: 'POST',
                     ...getAuthRequestOptions(),
                     body: JSON.stringify({ dateOfBooking }),
@@ -235,7 +234,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         try {
 
-            const response = await fetch(`${backendBaseUrl}/book-Hotel`, {
+            const response = await fetch(`/book-Hotel`, {
                 method: 'POST',
                 ...getAuthRequestOptions(),
                 body: JSON.stringify({ dateOfBooking }),
@@ -275,7 +274,7 @@ async function bookDeluxeRoom(){
 
     try {
 
-        const response = await fetch(`${backendBaseUrl}/book-Hotel`, {
+        const response = await fetch(`/book-Hotel`, {
             method: 'POST',
             ...getAuthRequestOptions(),
             body: JSON.stringify({ dateOfBooking }),
@@ -307,7 +306,7 @@ async function bookDeluxeRoom(){
 
     async function cancelRecentBooking() {
         try {
-            const response = await fetch(`${backendBaseUrl}/cancel-recent-booking`, {
+            const response = await fetch(`/cancel-recent-booking`, {
                 method: 'DELETE',
                 ...getAuthRequestOptions(),
             });
@@ -339,7 +338,7 @@ async function bookDeluxeRoom(){
         }
 
         try {
-            const response = await fetch(`${backendBaseUrl}/update-address`, {
+            const response = await fetch(`/update-address`, {
                 method: 'PUT',
                 ...getAuthRequestOptions(),
                 body: JSON.stringify({ updatedAddress }),
@@ -365,7 +364,7 @@ async function bookDeluxeRoom(){
 
     async function fetchAllBookings() {
         try {
-            const response = await fetch(`${backendBaseUrl}/user-bookings`, {
+            const response = await fetch(`/user-bookings`, {
                 method: 'GET',
                 ...getAuthRequestOptions(),
             });
