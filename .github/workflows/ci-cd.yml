@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
+      with:
+        path: .   
 
     - name: Set up JDK
       uses: actions/setup-java@v2
@@ -22,6 +24,12 @@ jobs:
     - name: Build and Test
       run: |
         ./mvnw clean install
+    
+    - name: Debug Information
+      run: |
+        pwd
+        ls -al
+      
 
   deploy:
     runs-on: ubuntu-latest
