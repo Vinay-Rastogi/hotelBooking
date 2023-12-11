@@ -62,7 +62,17 @@ async function saveUserToDynamoDB(dynamoDB, firstName, lastName, address, email,
 // Function to book gas
 async function bookGas(dynamoDB, email, address, gasBookingTableName, IndexName) {
   try {
+    // Check if the user has booked within the last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
+    const existingBooking = await getRecentBooking(dynamoDB, email, sevenDaysAgo.toISOString(), gasBookingTableName, IndexName);
+
+    if (existingBooking) {
+      throw new Error('Cannot book gas within 7 days of the previous booking.');
+    }
+
+    // Proceed with the booking
     const bookingDate = new Date().toISOString();
     const booking = {
       bookingDate: bookingDate,
@@ -128,7 +138,6 @@ async function viewAllBookings(dynamoDB, email, gasBookingTableName, IndexName) 
 // Function to update user address
 async function updateAddress(dynamoDB, email, newAddress, gasBookingTableName, IndexName) {
   try {
-    console.log("here 5");
     console.log(newAddress);
     const latestBooking = await getRecentBooking(dynamoDB, email, '1970-01-01T00:00:00.000Z', gasBookingTableName, IndexName);
 
@@ -288,7 +297,7 @@ app.post('/login', async (req, res) => {
 app.post('/book-gas', verifyToken, async (req, res) => {
   try {
     const userEmail = req.user.email;
-    const address = req.body.roomType;
+    const address = req.body.address;
 
     const message = await bookGas(dynamoDB, userEmail, address, gasBookingTableName, IndexName);
     res.json({ message });
@@ -312,13 +321,10 @@ app.get('/user-bookings', verifyToken, async (req, res) => {
 // Endpoint to update user address
 app.put('/update-address', verifyToken, async (req, res) => {
   try {
-
-
     const email = req.user.email;
-    const address = req.body.updateAddress;
+    const address = req.body.updatedAddress;
 
-
-    const response = await updateAddress(dynamoDB, email, address, gasBookingTableName, IndexName);
+    const response = await updateAddress(dynamoDB, email, newAddress, gasBookingTableName, IndexName);
     res.json(response);
   } catch (error) {
     res.status(500).json({ error: error.message });
