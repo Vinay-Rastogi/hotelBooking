@@ -1,35 +1,4 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
-const AWS = require('aws-sdk');
-const bcrypt = require('bcrypt');
-const path = require("path")
-
-const app = express();
-const port = process.env.PORT || 8080;
-
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://test-env.eba-ryprfkss.us-east-1.elasticbeanstalk.com');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
-
-app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json());
-
-app.use("/", express.static(path.join(__dirname, "..", "client")))
-
-// Configure AWS DynamoDB
-AWS.config.update({
-  region: 'us-east-1',
-  accessKeyId: 'AKIA2GSKERJERU6GFI4Y',
-  secretAccessKey: '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',
-});
-
-
+// Function to retrieve user by email from DynamoDB
 async function getUserByEmail(dynamoDB, email, usersTableName) {
   const params = {
     TableName: usersTableName,
@@ -60,24 +29,17 @@ async function saveUserToDynamoDB(dynamoDB, firstName, lastName, address, email,
 }
 
 // Function to book gas
-async function bookGas(dynamoDB, email, address, gasBookingTableName, IndexName) {
+async function bookGas(dynamoDB, email, address, gasBookingTableName, IndexName, bookedDate, days, roomType) {
   try {
-    // Check if the user has booked within the last 7 days
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-    const existingBooking = await getRecentBooking(dynamoDB, email, sevenDaysAgo.toISOString(), gasBookingTableName, IndexName);
-
-    if (existingBooking) {
-      throw new Error('Cannot book gas within 7 days of the previous booking.');
-    }
 
     // Proceed with the booking
     const bookingDate = new Date().toISOString();
     const booking = {
       bookingDate: bookingDate,
       email: email,
-      address: address,
+      bookedDate: bookedDate,
+      days: days,
+      roomType: roomType
     };
 
     await saveGasBookingToDynamoDB(dynamoDB, booking, gasBookingTableName);
@@ -136,13 +98,13 @@ async function viewAllBookings(dynamoDB, email, gasBookingTableName, IndexName) 
 }
 
 // Function to update user address
-async function updateAddress(dynamoDB, email, newAddress, gasBookingTableName, IndexName) {
+async function updateAddress(dynamoDB, email, newBookedDate, gasBookingTableName, IndexName) {
   try {
-    console.log(newAddress);
+    console.log(newBookedDate);
     const latestBooking = await getRecentBooking(dynamoDB, email, '1970-01-01T00:00:00.000Z', gasBookingTableName, IndexName);
 
     if (!latestBooking) {
-      throw new Error('No booking found to edit Address.');
+      throw new Error('No booking found to edit lastDate.');
     }
 
     const currentDateTime = new Date();
@@ -153,28 +115,26 @@ async function updateAddress(dynamoDB, email, newAddress, gasBookingTableName, I
       throw new Error('Cannot edit booking address after 24 hours of booking date-time.');
     }
 
-    console.log('Updating Address to:', newAddress);
-
     await dynamoDB.update({
       TableName: gasBookingTableName,
       Key: {
         email: email,
         bookingDate: latestBooking.bookingDate,
       },
-      UpdateExpression: 'SET #address = :newAddress',
+      UpdateExpression: 'SET #bookedDate = :newBookedDate',
       ExpressionAttributeNames: {
-        '#address': 'address',
+        '#bookedDate': 'bookedDate',
       },
       ExpressionAttributeValues: {
-        ':newAddress': newAddress,
+        ':newBookedDate': newBookedDate,
       },
     }).promise();
 
-    console.log('Address Updated successfully!');
-    return 'Address Updated successfully!';
+    console.log('bookedDate Updated successfully!');
+    return 'bookedDate Updated successfully!';
   } catch (error) {
-    console.error('Error during updating address:', error);
-    throw new Error('Failed to update address ' + error.message);
+    console.error('Error during updating bookedDate:', error);
+    throw new Error('Failed to update bookedDate ' + error.message);
   }
 }
 
@@ -212,6 +172,37 @@ async function cancelBooking(dynamoDB, email, gasBookingTableName, IndexName) {
   }
 }
 
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
+const AWS = require('aws-sdk');
+const bcrypt = require('bcrypt');
+const path = require("path")
+
+const app = express();
+const port = process.env.PORT || 8080;
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://test-env.eba-ryprfkss.us-east-1.elasticbeanstalk.com');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
+
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.use("/", express.static(path.join(__dirname, "..", "client")))
+
+// Configure AWS DynamoDB
+AWS.config.update({
+  region: 'us-east-1',
+  accessKeyId: 'AKIA2GSKERJERU6GFI4Y',
+  secretAccessKey: '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',
+});
+
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 const gasBookingTableName = 'GasBookings';
 const usersTableName = 'Users';
@@ -233,11 +224,11 @@ const verifyToken = (req, res, next) => {
     req.user = decoded;
     next();
   });
-};
+}; 
 
 // Endpoint to get background image
 app.get('/background-image', (req, res) => {
-  const imageUrl = './bgImg.png';
+  const imageUrl = './bgimg.jpg';
   res.json({ imageUrl });
 });
 
@@ -298,8 +289,11 @@ app.post('/book-gas', verifyToken, async (req, res) => {
   try {
     const userEmail = req.user.email;
     const address = req.body.address;
+    const bookedDate = req.body.bookedDate;
+    const days = req.body.days;
+    const roomType = req.body.roomType;
 
-    const message = await bookGas(dynamoDB, userEmail, address, gasBookingTableName, IndexName);
+    const message = await bookGas(dynamoDB, userEmail, address, gasBookingTableName, IndexName, bookedDate, days, roomType);
     res.json({ message });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -324,7 +318,7 @@ app.put('/update-address', verifyToken, async (req, res) => {
     const email = req.user.email;
     const address = req.body.updatedAddress;
 
-    const response = await updateAddress(dynamoDB, email, newAddress, gasBookingTableName, IndexName);
+    const response = await updateAddress(dynamoDB, email, address, gasBookingTableName, IndexName);
     res.json(response);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -341,6 +335,8 @@ app.delete('/cancel-recent-booking', verifyToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
 
 app.use("*", (_, res) => res.redirect("/login.html"))
 

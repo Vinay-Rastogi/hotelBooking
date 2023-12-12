@@ -1,17 +1,11 @@
 body {
   color: #fff;
-  /* background-image: url() !important; */
-  background-color: pink !important;
-  /* background-repeat: no-repeat;
-  background-size: 80%; */
+  background-repeat: no-repeat;
+  background-size: 100%;
   /* background-position-x: -300px; */
-  overflow: hidden;
+  background-size: 100%;
   font-family: "Roboto", sans-serif;
-}
-
-.error-message {
-  color: red;
-  margin-left: 2%;
+  overflow-y: hidden;
 }
 
 .form-control {
@@ -32,7 +26,7 @@ body {
 
 .signup-form,
 .login-form,
-.hotelBooking-form,
+.gasBooking-form,
 .viewAllBookings-form,
 .cancelBookings-form {
   width: 390px;
@@ -44,13 +38,13 @@ body {
     rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
 
-#hotelBooking-form {
+#gasBooking-form{
   min-height: 270px;
 }
 
 .signup-form form,
 .login-form form,
-.hotelBooking-form form,
+.gasBooking-form form,
 .viewAllBookings-form form,
 .cancelBookings-form form {
   color: #999;
@@ -63,7 +57,7 @@ body {
 
 .signup-form h2,
 .login-form h2,
-.hotelBooking-form h2,
+.gasBooking-form h2,
 .viewAllBookings-form h2,
 .cancelBookings-form h2 {
   color: #333;
@@ -77,7 +71,7 @@ body {
 
 .signup-form .form-group,
 .login-form .form-group,
-.hotelBooking-form .form-group,
+.gasBooking-form .form-group,
 .viewAllBookings-form .form-group,
 .cancelBookings-form .form-group {
   margin-bottom: 20px;
@@ -91,9 +85,11 @@ body {
   padding-left: 10px;
 }
 
+
+
 .signup-form a,
 .login-form a,
-.hotelBooking-form a,
+.gasBooking-form a,
 .viewAllBookings-form a,
 .cancelBookings-form a {
   color: #fff;
@@ -102,14 +98,14 @@ body {
 
 .signup-form a:hover,
 .login-form a:hover,
-.hotelBooking-form a:hover,
+.gasBooking-form a:hover,
 .viewAllBookings-form a:hover .cancelBookings-form a:hover {
   text-decoration: none;
 }
 
 .signup-form form a,
 .login-form form a,
-.hotelBooking-form form a,
+.gasBooking-form form a,
 .viewAllBookings-form form a,
 .cancelBookings-form form a {
   color: #3598dc;
@@ -118,7 +114,7 @@ body {
 
 .signup-form form a:hover,
 .login-form form a:hover,
-.hotelBooking-form form a:hover,
+.gasBooking-form form a:hover,
 .viewAllBookings-form form a:hover,
 .cancelBookings-form form a:hover {
   text-decoration: underline;
@@ -135,7 +131,7 @@ body {
   margin-top: 12%;
 }
 
-.hotelBooking-form,
+.gasBooking-form,
 .viewAllBookings-form,
 .cancelBookings-form {
   margin-top: 15%;
@@ -148,16 +144,12 @@ body {
 }
 
 .container {
-  height: 700px;
-  width: 500px;
-  margin-top: 10%;
+  /* height: 700px; */
+  /* width: 500px; */
+  margin-top: 4%;
   margin-left: 10%;
 }
 
 .bookingContainer {
   width: 40%;
-}
-
-.bookHotelBtn {
-  font-size: 20px !important;
 }
